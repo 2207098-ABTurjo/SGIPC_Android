@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
+            android:name=".MemberListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UpcomingWorkshopActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UpcomingContestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home_page"
+            android:exported="false" />
+        <activity
             android:name=".Sign_up"
             android:exported="false" />
         <activity
