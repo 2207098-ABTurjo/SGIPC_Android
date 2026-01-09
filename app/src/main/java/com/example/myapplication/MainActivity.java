@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +32,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
+        EditText emailEditText = findViewById(R.id.editTextTextEmailAddress);
+        String email = emailEditText.getText().toString();
+
+        String userRole = "General Member";
+        if (email.toLowerCase().contains("committee")) {
+            userRole = "Committee Member";
+        }
+
         Intent intent = new Intent(this, Home_page.class);
+        intent.putExtra("user_role", userRole);
         startActivity(intent);
     }
 }

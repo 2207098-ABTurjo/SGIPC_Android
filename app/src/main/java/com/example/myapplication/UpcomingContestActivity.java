@@ -1,61 +1,70 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Chronometer;
-import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class UpcomingContestActivity extends AppCompatActivity {
 
-    private TextView noContestMessage;
-    private ConstraintLayout contestView;
+    private RecyclerView contestsRecyclerView;
+    private ContestAdapter contestAdapter;
+    private ArrayList<Contest> contestList = new ArrayList<>();
     private Button addContestButton;
-    private Chronometer countdownTimer;
+
+    private final ActivityResultLauncher<Intent> addContestLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Bundle data = result.getData().getExtras();
+                    String title = data.getString("title");
+                    String time = data.getString("time");
+                    int duration = data.getInt("duration");
+                    String link = data.getString("link");
+
+                    contestList.add(new Contest(title, time, duration, link));
+                    Collections.sort(contestList, (c1, c2) -> c1.getTime().compareTo(c2.getTime()));
+                    contestAdapter.notifyDataSetChanged();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.upcoming_contest);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        noContestMessage = findViewById(R.id.no_contest_message);
-        contestView = findViewById(R.id.contest_view);
+        contestsRecyclerView = findViewById(R.id.contests_recycler_view);
         addContestButton = findViewById(R.id.add_contest_button);
-        countdownTimer = findViewById(R.id.countdown_timer);
 
-
-        boolean contestAvailable = true; 
-
-        if (contestAvailable) {
-            noContestMessage.setVisibility(View.GONE);
-            contestView.setVisibility(View.VISIBLE);
-            countdownTimer.setBase(SystemClock.elapsedRealtime() + 3600000);
-            countdownTimer.start();
-        } else {
-            noContestMessage.setVisibility(View.VISIBLE);
-            contestView.setVisibility(View.GONE);
-        }
-
-        boolean isCommitteeMember = true;
-
-        if (isCommitteeMember) {
+        String userRole = getIntent().getStringExtra("user_role");
+        if ("Committee Member".equals(userRole)) {
             addContestButton.setVisibility(View.VISIBLE);
         } else {
             addContestButton.setVisibility(View.GONE);
         }
+
+        contestsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        contestAdapter = new ContestAdapter(this, contestList);
+        contestsRecyclerView.setAdapter(contestAdapter);
+
+
+        contestList.add(new Contest("Weekly Contest #1", "2024-12-24 22:00", 90, "https://www.google.com"));
+        contestList.add(new Contest("Weekly Contest #2", "2024-12-31 22:00", 120, "https://www.google.com"));
+        Collections.sort(contestList, (c1, c2) -> c1.getTime().compareTo(c2.getTime()));
+        contestAdapter.notifyDataSetChanged();
+
+        addContestButton.setOnClickListener(v -> {
+            Intent intent = new Intent(UpcomingContestActivity.this, AddContestActivity.class);
+            addContestLauncher.launch(intent);
+        });
     }
 }

@@ -24,11 +24,14 @@ public class Home_page extends AppCompatActivity {
             return insets;
         });
 
+        String userRole = getIntent().getStringExtra("user_role");
+
         Button upcomingContestButton = findViewById(R.id.upcoming_contest_button);
         upcomingContestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Home_page.this, UpcomingContestActivity.class);
+                intent.putExtra("user_role", userRole);
                 startActivity(intent);
             }
         });
@@ -38,6 +41,7 @@ public class Home_page extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Home_page.this, UpcomingWorkshopActivity.class);
+                intent.putExtra("user_role", userRole);
                 startActivity(intent);
             }
         });

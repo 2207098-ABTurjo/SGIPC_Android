@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
+            android:name=".AddContestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddWorkshopActivity"
+            android:exported="false" />
+        <activity
             android:name=".MemberListActivity"
             android:exported="false" />
         <activity
