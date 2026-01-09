@@ -6,6 +6,9 @@ public class Contest {
     private int duration;
     private String link;
 
+    public Contest() {
+    }
+
     public Contest(String title, String time, int duration, String link) {
         this.title = title;
         this.time = time;
@@ -27,5 +30,21 @@ public class Contest {
 
     public String getLink() {
         return link;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }

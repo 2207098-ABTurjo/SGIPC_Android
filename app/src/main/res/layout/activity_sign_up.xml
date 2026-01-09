@@ -39,7 +39,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Enter Roll"
-        android:inputType="text"
+        android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextText2" />
@@ -87,7 +87,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Codeforces Handle"
-        android:inputType="text"
+        android.inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword3" />

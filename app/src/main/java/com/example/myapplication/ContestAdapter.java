@@ -2,6 +2,8 @@ package com.example.myapplication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -9,12 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -55,6 +59,8 @@ public class ContestAdapter extends RecyclerView.Adapter<ContestAdapter.ContestV
         private final Button contestLinkButton;
         private CountDownTimer countDownTimer;
 
+        private final List<String> BROWSER_KEYWORDS = Arrays.asList("chrome", "firefox", "opera", "samsung", "edge", "browser");
+
         public ContestViewHolder(@NonNull View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.contest_title);
@@ -67,12 +73,64 @@ public class ContestAdapter extends RecyclerView.Adapter<ContestAdapter.ContestV
             titleTextView.setText(contest.getTitle());
             timeTextView.setText(String.format("Starts at: %s, Duration: %d minutes", contest.getTime(), contest.getDuration()));
 
-            contestLinkButton.setOnClickListener(v -> {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(contest.getLink()));
-                context.startActivity(intent);
-            });
+            String rawLink = contest.getLink();
+            if (rawLink == null || rawLink.trim().isEmpty()) {
+                contestLinkButton.setVisibility(View.GONE);
+            } else {
+                contestLinkButton.setVisibility(View.VISIBLE);
+                final String normalized = normalizeUrl(rawLink.trim());
+                contestLinkButton.setOnClickListener(v -> {
+                    try {
+                        Uri uri = Uri.parse(normalized);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        PackageManager pm = context.getPackageManager();
+
+                        List<ResolveInfo> handlers = pm.queryIntentActivities(intent, 0);
+                        String chosenBrowserPackage = null;
+                        if (handlers != null && !handlers.isEmpty()) {
+                            for (ResolveInfo info : handlers) {
+                                String pkg = info.activityInfo.packageName.toLowerCase(Locale.ROOT);
+                                for (String kw : BROWSER_KEYWORDS) {
+                                    if (pkg.contains(kw)) {
+                                        chosenBrowserPackage = info.activityInfo.packageName;
+                                        break;
+                                    }
+                                }
+                                if (chosenBrowserPackage != null) break;
+                            }
+                        }
+
+                        if (chosenBrowserPackage != null) {
+                            intent.setPackage(chosenBrowserPackage);
+                            context.startActivity(intent);
+                        } else {
+                            Intent chooser = Intent.createChooser(intent, "Open link with");
+                            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            if (chooser.resolveActivity(pm) != null) {
+                                context.startActivity(chooser);
+                            } else {
+                                Toast.makeText(context, "No application available to open the link", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Unable to open link", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
             startCountdown(contest.getTime());
+        }
+
+        private String normalizeUrl(String url) {
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                return "https://" + url;
+            }
+            return url;
         }
 
         private void startCountdown(String contestTime) {
