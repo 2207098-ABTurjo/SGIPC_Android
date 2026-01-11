@@ -18,7 +18,7 @@
             android:text="Contest Title"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/contest_link_button"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,7 +48,8 @@
             android:layout_height="wrap_content"
             android:text="Contest Link"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/countdown_timer"
+            android:layout_marginTop="8dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
